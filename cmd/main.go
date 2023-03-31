@@ -1,7 +1,3 @@
-# Helper for clone interface without struct
-
-Example:
-```go
 package main
 
 import (
@@ -32,7 +28,5 @@ func main() {
 
 	interface2.SetString("world")
 	fmt.Println(interface1, interface2)
+
 }
-```
-
-

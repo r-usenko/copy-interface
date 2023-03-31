@@ -1,12 +1,16 @@
-package interfaceCopier
 package interfaceCopier_test
 
 import (
 	"bytes"
 	"testing"
-  
-  "github.com/r-usenko/copy-interface"
+
+	"github.com/r-usenko/copy-interface"
 )
+
+type inter interface {
+	Marshal() ([]byte, error)
+	Unmarshal(data []byte) error
+}
 
 type dummy struct {
 	val []byte
@@ -46,17 +50,29 @@ func test(b *testing.B, interface1, interface2 inter) {
 	}
 }
 
-func BenchmarkClone(b *testing.B) {
+func BenchmarkCloneNew(b *testing.B) {
+	var interface1, interface2 inter
+	interface1 = &dummy{val: input}
+
+	for i := 0; i < b.N; i++ {
+		interface2 = interfaceCopier.New(interface1).CloneInterface().(inter)
+	}
+
+	test(b, interface1, interface2)
+}
+
+func BenchmarkCloneCache(b *testing.B) {
 	var interface1, interface2 inter
 	interface1 = &dummy{val: input}
 
 	rt := interfaceCopier.New(interface1)
 	for i := 0; i < b.N; i++ {
-		interface2 = rt.CloneInterface()
+		interface2 = rt.CloneInterface().(inter)
 	}
 
 	test(b, interface1, interface2)
 }
+
 func BenchmarkStruct(b *testing.B) {
 	var interface1, interface2 inter
 
